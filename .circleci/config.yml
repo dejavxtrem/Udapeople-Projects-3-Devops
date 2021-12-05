@@ -2,7 +2,7 @@ version: 2.1
 
 
 orbs: 
-  slack: circleci/slack@4.5.0
+  slack: circleci/slack@4.4.4
 
 
 
@@ -109,6 +109,12 @@ jobs:
             cd frontend
             npm install && npm run test
 
+      - slack/notify:
+          channel: circlecinotification
+          event: fail
+          template: basic_fail_1
+          mentions: '@Dejay'
+
   test-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -166,6 +172,7 @@ workflows:
       - build-backend:
           context: Udapeople
       - test-frontend:
+          context: Udapeople
           requires: [build-frontend]
       - test-backend:
           requires: [build-backend]
