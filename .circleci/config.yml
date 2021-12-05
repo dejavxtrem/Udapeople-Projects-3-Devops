@@ -60,7 +60,7 @@ jobs:
           key: frontend-build
 
       - slack/notify:
-          channel: circlecinotification
+          channel: udapeople
           event: fail
           template: basic_fail_1
           mentions: '@Dejay'
@@ -85,7 +85,7 @@ jobs:
           key: backend-build
 
       - slack/notify:
-          channel: circlecinotification
+          channel: udapeople
           event: fail
           template: basic_fail_1
           mentions: '@Dejay'
@@ -110,7 +110,7 @@ jobs:
             npm install && npm run test
 
       - slack/notify:
-          channel: circlecinotification
+          channel: udapeople
           event: fail
           template: basic_fail_1
           mentions: '@Dejay'
@@ -172,8 +172,8 @@ workflows:
       - build-backend:
           context: Udapeople
       - test-frontend:
-          context: Udapeople
           requires: [build-frontend]
+          context: Udapeople
       - test-backend:
           requires: [build-backend]
       - scan-frontend:
