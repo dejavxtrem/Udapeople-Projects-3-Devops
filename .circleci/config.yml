@@ -59,6 +59,11 @@ jobs:
           paths: [frontend/node_modules]
           key: frontend-build
 
+      - slack/notify:
+          channel: circlecinotification
+          event: fail
+          template: basic_fail_1
+          mentions: '@Dejay'
 ## back-end
 
   build-backend:
@@ -158,7 +163,8 @@ workflows:
     jobs:
       - build-frontend:
           context: Udapeople
-      - build-backend
+      - build-backend:
+          context: Udapeople
       - test-frontend:
           requires: [build-frontend]
       - test-backend:
