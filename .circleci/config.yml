@@ -21,7 +21,7 @@ commands:
           when: on_fail
           command: |
             # Your code here
-            # aws s3 rm --recursive s3://udapeople-${CIRCLE_WORKFLOW_ID}
+            aws s3 rm --recursive s3://udapeople-${CIRCLE_WORKFLOW_ID}
             aws cloudformation delete-stack \
                 --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID}"
             aws cloudformation delete-stack \
@@ -209,7 +209,7 @@ jobs:
             # Your code here
             PUBLIC_DNS=$(aws ec2 describe-instances \
                                     --filters Name=tag:Name,Values="backend-${CIRCLE_WORKFLOW_ID}" Name=instance-state-name,Values=running \
-                                    --query 'Reservations[*].Instances[*].PublicDnsName' \
+                                    --query 'Reservations[*].Instances[*].PublicIpAddress' \
                                     --output text)
 
             echo ${PUBLIC_DNS} >>  .circleci/ansible/inventory.txt
