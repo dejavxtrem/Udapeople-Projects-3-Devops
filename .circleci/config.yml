@@ -6,18 +6,27 @@ orbs:
   aws-cli: circleci/aws-cli@2.0.3
 
 
-# commands:
-#   destroy-environment:
-#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-#     parameters:
-#       # Add parameter here   
-#     steps:
-#       - run:
-#           name: Destroy environments
-#           when: on_fail
-#           command: |
-#             # Your code here
-#             exit 1
+commands:
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    parameters:
+    # Add parameter here
+        workflow_id:
+            type: string
+        
+
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            # Your code here
+            # aws s3 rm --recursive s3://udapeople-${CIRCLE_WORKFLOW_ID}
+            aws cloudformation delete-stack \
+                --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID}"
+            # aws cloudformation delete-stack \
+            #      --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID}"
+
 
 #   revert-migrations:
 #     description: Revert the last migration if successfully run in the current workflow.
@@ -177,9 +186,10 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople-backend \
-              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \  
-              --region ${AWS_DEFAULT_REGION}
+              --region ${AWS_DEFAULT_REGION} \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}"   
+              
           
 
 
