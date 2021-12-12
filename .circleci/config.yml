@@ -28,24 +28,24 @@ commands:
                  --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID}"
 
 
-#   revert-migrations:
-#     description: Revert the last migration if successfully run in the current workflow.
-#     parameters:
-#       # Add parameter here     
-#     steps:
-#       - run:
-#           name: Revert migrations
-#           # Add when this will run
-#           command: |
-#             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-#             SUCCESS = 1
-#             if(( $SUCCESS==1 )); 
-#             then
-#             #  cd ~/project/backend
-#             #  npm install
-#             #  Add revert code here. You can find this in the Getting Started section.
-#               exit 1
-#             fi
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      # Add parameter here     
+    steps:
+      - run:
+          name: Revert migrations
+          # Add when this will run
+          command: |
+            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+            SUCCESS = 1
+            if(( $SUCCESS==1 )); 
+            then
+               cd ~/project/backend
+               npm install
+               npm run migrations:revert
+               exit 1
+            fi
 
 
 ## front-end
@@ -262,24 +262,73 @@ jobs:
 
       - destroy-environment:
                   workflow_id: '${CIRCLE_WORKFLOW_ID}' 
-      # Here's where you will add some code to rollback on failure      
+      # Here's where you will add some code to rollback on failure   
+      
+      
 
-  #  run-migrations:
-  #   docker:
-  #     # Docker image here that supports NodeJS
-  #   steps:
-  #     # Checkout code from git
-  #     - run:
-  #         name: Run migrations
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     - run:
-  #         name: Send migration results to memstash
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #    # Here's where you will add some code to rollback on failure  
+
+   run-migrations:
+    docker:
+      # Docker image here that supports NodeJS
+      - image: circleci/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      - aws-cli/setup
+      - attach_workspace:
+            at: ~/
+      - run:
+          name: Run migrations
+          command: |
+            # Your code here
+            echo    ENVIRONMENT=production                                 > "backend/.env"
+            echo    TYPEORM_CONNECTION=postgres                            >> "backend/.env"
+            echo    TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts   >> "backend/.env"
+            echo    TYPEORM_MIGRATIONS=./src/migrations/*.ts               >> "backend/.env"
+            echo    TYPEORM_MIGRATIONS_DIR=./src/migrations                >> "backend/.env"
+            echo    NODE_ENV=production                                    >> "backend/.env"
+            echo    TYPEORM_HOST=$TYPEORM_HOST                             >> "backend/.env"
+            echo    TYPEORM_PORT=$TYPEORM_PORT                             >> "backend/.env"
+            echo    TYPEORM_USERNAME=$TYPEORM_USERNAME                     >> "backend/.env"
+            echo    TYPEORM_PASSWORD=$TYPEORM_PASSWORD                     >> "backend/.env"
+            echo    TYPEORM_DATABASE=$TYPEORM_DATABASE                     >> "backend/.env"
+
+            cd backend
+            npm install typescript
+            npm run migrations > migrations_dump.log
+            echo
+            cat migration_output.log
+            echo
+            pwd migration_output.log
+
+      - run:
+          name: Send migration results to memstash
+          command: |
+            # Your code here
+            cd backend
+
+
+            if [grep -q "has been executed successfully" migration_output.log]; then
+              curl -H "Content-Type: text/plain" -H "token: 6e293650-a25d-4950-b76a-a40052493b7e" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
+            else
+              curl -H "Content-Type: text/plain" -H "token: 6e293650-a25d-4950-b76a-a40052493b7e" --request PUT --data "0" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
+            fi
+     # Here's where you will add some code to rollback on failure  
+      - persist_to_workspace:
+            root: ~/
+            paths:
+                - project/backend/migration_output.log
+
+      - revert-migrations
+      - destroy-environment:
+                  workflow_id: '${CIRCLE_WORKFLOW_ID}'
+      - slack/notify:
+          channel: udapeople
+          event: fail
+          template: basic_fail_1
+          mentions: '@Dejay'
+
+
 
 workflows:
   default:
@@ -301,5 +350,6 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       - configure-infrastructure:
           requires: [deploy-infrastructure]  
-      
+      - run-migrations:
+          requires: [configure-infrastructure]
            
