@@ -193,7 +193,7 @@ jobs:
               
        # deploy front end infrastructure
       - run:
-          name: Ensure back-end infrastructure exists
+          name: Ensure front-end infrastructure exists
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
