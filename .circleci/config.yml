@@ -294,11 +294,17 @@ jobs:
             echo    TYPEORM_DATABASE=$TYPEORM_DATABASE                     >> "backend/.env"
 
             cd backend
-            npm run migrations > migrations_dump.log
+            npm install typescript
+            npm run migrations > migrations_output.log
+
+
             echo
             cat migration_output.log
             echo
             pwd migration_output.log
+            echo
+
+          no_output_timeout: 30m  
 
       - run:
           name: Send migration results to memstash
