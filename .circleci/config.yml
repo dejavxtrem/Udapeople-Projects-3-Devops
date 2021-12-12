@@ -294,7 +294,6 @@ jobs:
             echo    TYPEORM_DATABASE=$TYPEORM_DATABASE                     >> "backend/.env"
 
             cd backend
-            npm install typescript
             npm run migrations > migrations_dump.log
             echo
             cat migration_output.log
@@ -328,7 +327,28 @@ jobs:
           template: basic_fail_1
           mentions: '@Dejay'
 
-
+  
+  
+  # deploy-frontend:
+  #   docker:
+  #     # Docker image here that supports AWS CLI
+  #   steps:
+  #     # Checkout code from git
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # your code here
+  #     - run:
+  #         name: Get backend url
+  #         command: |
+  #           # your code here
+  #           export API_URL="http://${BACKEND_IP}:3030"
+  #           echo "${API_URL}"
+  #     - run:
+  #         name: Deploy frontend objects
+  #         command: |
+  #           # your code here
+  #     # Here's where you will add some code to rollback on failure 
 
 workflows:
   default:
@@ -351,5 +371,6 @@ workflows:
       - configure-infrastructure:
           requires: [deploy-infrastructure]  
       - run-migrations:
-          requires: [configure-infrastructure]
+           context: Udapeople
+           requires: [configure-infrastructure]
            
