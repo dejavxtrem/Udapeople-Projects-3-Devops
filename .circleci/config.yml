@@ -222,8 +222,64 @@ jobs:
             paths:
               - project/.circleci/ansible/inventory.txt
       - destroy-environment:
-                  workflow_id: '${CIRCLE_WORKFLOW_ID}'                
+                  workflow_id: '${CIRCLE_WORKFLOW_ID}'  
 
+
+  # configure ec2 instance for ansible     
+
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.11
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+            fingerprints: ["bd:21:1b:86:59:e3:54:77:19:f3:e1:0d:d2:1e:ae:1c"] 
+      # attach workspace
+      - attach_workspace:
+            at: ~/       
+
+      - restore_cache:
+            keys: ['backend-build']  
+
+      - run:
+          name: Install dependencies
+          command: |
+            
+            apk add --update ansible
+      - run:
+          name: Configure server
+          command: |
+            # Your code here
+            echo
+            cat .circleci/ansible/inventory.txt
+
+            ansible-playbook \
+            -i .circleci/ansible/inventory.txt \
+            .circleci/ansible/configure-server.yml
+
+      - destroy-environment:
+            workflow_id: '${CIRCLE_WORKFLOW_ID}' 
+      # Here's where you will add some code to rollback on failure      
+
+  run-migrations:
+    docker:
+      # Docker image here that supports NodeJS
+    steps:
+      # Checkout code from git
+      - run:
+          name: Run migrations
+          command: |
+            # Your code here
+            exit 1
+      - run:
+          name: Send migration results to memstash
+          command: |
+            # Your code here
+            exit 1
+     # Here's where you will add some code to rollback on failure  
 workflows:
   default:
     jobs:
@@ -242,4 +298,7 @@ workflows:
           requires: [build-backend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      - configure-backend-infrastructure:
+          requires: [deploy-infrastructure]  
+      
            
