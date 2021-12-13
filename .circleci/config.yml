@@ -301,9 +301,9 @@ jobs:
 
 
             echo
-            cat migration_dump.txt
+            cat migrations_dump.txt
             echo
-            pwd migration_dump.txt
+            pwd migrations_dump.txt
             echo
 
           no_output_timeout: 30m  
