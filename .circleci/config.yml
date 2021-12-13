@@ -335,26 +335,58 @@ jobs:
 
   
   
-  # deploy-frontend:
-  #   docker:
-  #     # Docker image here that supports AWS CLI
-  #   steps:
-  #     # Checkout code from git
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           # your code here
-  #           export API_URL="http://${BACKEND_IP}:3030"
-  #           echo "${API_URL}"
-  #     - run:
-  #         name: Deploy frontend objects
-  #         command: |
-  #           # your code here
-  #     # Here's where you will add some code to rollback on failure 
+  deploy-frontend:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: circleci/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      - aws-cli/setup
+      - attach_workspace:
+            at: ~/
+
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            cd frontend
+            npm install webpack-dev-server
+            npm install
+
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+            export BACKEND_IP=$(aws ec2 describe-instances \
+                                    --filters Name=tag:Name,Values="backend-${CIRCLE_WORKFLOW_ID}" Name=instance-state-name,Values=running \
+                                    --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                                    --output text)
+
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            echo     ENVIRONMENT=production     >  "frontend/.env"
+            echo     NODE_ENV=production        >> "frontend/.env"
+            cat frontend/.env
+
+      - run:
+          name: Deploy frontend objects
+          command: |
+            # your code here
+            cd frontend
+            ls -la
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive
+
+      - revert-migrations
+      - destroy-environment:
+                  workflow_id: '${CIRCLE_WORKFLOW_ID}'
+
+      # Here's where you will add some code to rollback on failure 
 
 workflows:
   default:
