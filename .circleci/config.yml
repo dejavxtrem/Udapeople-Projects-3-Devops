@@ -327,8 +327,8 @@ jobs:
                 - project/backend/migrations_dump.txt
 
       - revert-migrations
-      - destroy-environment:
-                  workflow_id: '${CIRCLE_WORKFLOW_ID}'
+      # - destroy-environment:
+      #             workflow_id: '${CIRCLE_WORKFLOW_ID}'
       - slack/notify:
           channel: udapeople
           event: fail
