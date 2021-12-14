@@ -39,7 +39,7 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = $(curl -H "token: 6e293650-a25d-4950-b76a-a40052493b7e" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID})
+            SUCCESS =$(curl -H "token: 6e293650-a25d-4950-b76a-a40052493b7e" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID})
             echo $SUCCESS
             if(( $SUCCESS==1));
             then
@@ -409,7 +409,7 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            apk add --update ansible openssh-client tar gzip
+            apk add --update ansible openssh-client tar gzip nodejs npm
       - run:
           name: Deploy backend
           command: |
