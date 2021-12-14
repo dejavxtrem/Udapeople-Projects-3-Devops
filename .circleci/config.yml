@@ -388,6 +388,46 @@ jobs:
 
       #  Here's where you will add some code to rollback on failure
 
+
+  deploy-backend:
+    docker:
+      # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.11
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+            fingerprints: ["bd:21:1b:86:59:e3:54:77:19:f3:e1:0d:d2:1e:ae:1c"] 
+      # attach workspace
+      - attach_workspace:
+            at: ~/
+      - restore_cache:
+            keys: ['backend-build']
+
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            apk add --update ansible openssh-client tar gzip
+      - run:
+          name: Deploy backend
+          command: |
+            # your code here
+           cd backend
+           npm i
+           npm run build
+           cd .. 
+           tar -C backend -czvf artifact.tar.gz .
+           cd .circleci/ansible
+           echo "Contents  of the inventory.txt file is -------"
+           cat inventory.txt
+           ansible-playbook -i inventory.txt deploy-backend.yml
+      # Here's where you will add some code to rollback on failure 
+      - revert-migrations
+      - destroy-environment:
+                  workflow_id: '${CIRCLE_WORKFLOW_ID}'
+
 workflows:
   default:
     jobs:
