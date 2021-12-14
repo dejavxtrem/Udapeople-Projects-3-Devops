@@ -396,7 +396,6 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - aws-cli/setup
       # Add ssh keys with fingerprint
       - add_ssh_keys:
             fingerprints: ["bd:21:1b:86:59:e3:54:77:19:f3:e1:0d:d2:1e:ae:1c"] 
@@ -424,10 +423,16 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
+
+      - run:
+          name: Install AWS CLI for rollback
+          when: on_fail
+          command: |
+              apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
       # Here's where you will add some code to rollback on failure 
       - revert-migrations
       - destroy-environment:
-                  workflow_id: '${CIRCLE_WORKFLOW_ID}'
+            workflow_id: '${CIRCLE_WORKFLOW_ID}'
 
 workflows:
   default:
