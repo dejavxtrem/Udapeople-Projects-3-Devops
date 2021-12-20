@@ -436,7 +436,7 @@ jobs:
             tar czf backend.tar.gz -P backend
             cp backend.tar.gz /home
             echo "Contents  of the inventory.txt file is -------"
-            cat inventory.txt
+            cat .circleci/ansible/inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook \
             -i .circleci/ansible/inventory.txt \
