@@ -435,10 +435,10 @@ jobs:
             echo
             tar czf backend.tar.gz -P backend
             cp backend.tar.gz /home
+            cd ..
+            ls -la
             export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook \
-            -i .circleci/ansible/inventory.txt \
-            .circleci/ansible/deploy-backend.yml 
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml 
             
             
 
