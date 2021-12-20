@@ -437,8 +437,10 @@ jobs:
             cp backend.tar.gz /home
             cd ..
             ls -la
+            cd project/.circleci/ansible
+            cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml 
+            ansible-playbook -i inventory.txt deploy-backend.yml 
             
             
 
