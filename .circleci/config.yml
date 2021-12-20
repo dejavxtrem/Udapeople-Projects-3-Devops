@@ -40,7 +40,7 @@ commands:
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             # SUCCESS =$(curl -H "token: 6e293650-a25d-4950-b76a-a40052493b7e" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID})
-            SUCCESS =1
+            SUCCESS=1
             echo $SUCCESS
             if(( $SUCCESS==1));
             then
@@ -428,6 +428,7 @@ jobs:
             cat inventory.txt
             ansible-playbook \
             -i inventory.txt deploy-backend.yml
+            yes
 
       - run:
           name: Install AWS CLI for rollback
@@ -451,19 +452,34 @@ jobs:
   #         command: |
   #           sudo apt update && sudo apt upgrade
   #           sudo apt install curl
+  #     - attach_workspace:
+  #           at: ~/
             
   #     - run:
   #         name: Get backend url
   #         command: |
   #           # your code here
+  #           export BACKEND_IP=$(aws ec2 describe-instances \
+  #                                   --filters Name=tag:Name,Values="backend-${CIRCLE_WORKFLOW_ID}" Name=instance-state-name,Values=running \
+  #                                   --query 'Reservations[*].Instances[*].PublicIpAddress' \
+  #                                   --output text)
+  #           export API_URL="http://${BACKEND_IP}:3030"
+  #           echo "API_URL = ${API_URL}"
   #     - run:
   #         name: Backend smoke test.
   #         command: |
-  #           # your code here
+  #           # your code here            
+  #           if curl "${API_URL}/api/status" | grep "ok"
+  #           then
+  #               return 0
+  #           else
+  #               return 1
+  #           fi
   #     - run:
   #         name: Frontend smoke test.
   #         command: |
   #           # your code here
+            
   #     # Here's where you will add some code to rollback on failure 
 
 
