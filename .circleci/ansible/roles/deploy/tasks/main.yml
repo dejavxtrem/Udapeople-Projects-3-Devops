@@ -3,13 +3,15 @@
 - name: Copy backend files
   become: true
   copy:
-      src: /home/artifact.tar.gz
-      dest: /home/ubuntu/artifact.tar.gz
+      src: /home/backend.tar.gz
+      dest: /home/ubuntu/backend.tar.gz
 
 - name: Start PM2
   shell: |
       cd /home/ubuntu/
-      tar xzvf artifact.tar.gz
+      tar xzvf backend.tar.gz
+      cd backend
       npm install
+      npm build
       pm2 stop default
-      pm2 start npm --start
+      pm2 start npm --name backend -- start
