@@ -435,15 +435,12 @@ jobs:
             echo
             tar czf backend.tar.gz -P backend
             cp backend.tar.gz /home
-            cd ..
-            ls -la
-            cd project/.circleci/ansible
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook -i inventory.txt deploy-backend.yml 
-            
-            
-
+     
       - run:
           name: Install AWS CLI for rollback
           when: on_fail
