@@ -435,6 +435,7 @@ jobs:
             tar czf backend.tar.gz -P backend
             cp backend.tar.gz /home
             cd ..
+            cd project
             ls -la
             cd .circleci/ansible
             export ANSIBLE_HOST_KEY_CHECKING=False
