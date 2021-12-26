@@ -11,7 +11,9 @@
       cd /home/ubuntu/
       tar xzvf backend.tar.gz
       cd backend
-      npm install
-      npm build
+      sudo npm install -g npm@latest
+      sudo npm install -g webpack-dev-server
+      sudo npm install
+      sudo npm run build
       pm2 stop default
-      pm2 start npm --name backend -- start
+      sudo pm2 start npm --name backend -- start
