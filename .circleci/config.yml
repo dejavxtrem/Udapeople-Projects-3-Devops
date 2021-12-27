@@ -469,11 +469,13 @@ jobs:
             sudo apt install curl
             apt-cache search libcurl | grep python
             sudo apt install python3-pycurl
+            sudo apt install python3-pip
 
       - run:
           name: Install AWS CLI 
           command: |
-            sudo apt update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+            pip3 install --upgrade pip
+            pip3 install awscli
       - attach_workspace:
             at: ~/
             
