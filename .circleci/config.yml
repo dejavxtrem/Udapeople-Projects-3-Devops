@@ -519,9 +519,9 @@ jobs:
             echo ${URL}
             if curl -s ${URL} | grep "Welcome"
             then
-              return 1
+              echo "connected on frontend ${URL}"
             else
-              return 1
+              echo "not connected on frontend ${url}"
             fi
 
       # Here's where you will add some code to rollback on failure 
