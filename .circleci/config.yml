@@ -470,6 +470,8 @@ jobs:
             apt-cache search libcurl | grep python
             sudo apt install python3-pycurl
             sudo apt install python3-pip
+            sudo apt install nodejs
+
 
       - run:
           name: Install AWS CLI 
@@ -478,6 +480,9 @@ jobs:
             pip3 install awscli
       - attach_workspace:
             at: ~/
+
+      - restore_cache:
+            keys: ['backend-build']
             
       - run:
           name: Get backend url
@@ -488,16 +493,17 @@ jobs:
                                     --query 'Reservations[*].Instances[*].PublicIpAddress' \
                                     --output text)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "API_URL = ${API_URL}"
+            echo "${API_URL}"
       - run:
           name: Backend smoke test.
           command: |
-            # your code here            
-            if curl "${API_URL}/api/status" | grep "ok"
+            # your code here
+            echo "${API_URL}"          
+            if [ curl "${API_URL}/api/status" | grep "ok" ]
             then
-                return 0
+              return 0
             else
-                return 1
+              return 1
             fi
       - run:
           name: Frontend smoke test.
