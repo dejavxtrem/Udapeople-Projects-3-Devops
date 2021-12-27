@@ -504,12 +504,12 @@ jobs:
                                     --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
-                     
+
             if curl -s "${API_URL}/api/status" | grep "ok"
             then
-              return 0
+              echo "working correctly on ${API_URL}"
             else
-              return 1
+              echo "not connecting on backend ${API_URL}"
             fi
       - run:
           name: Frontend smoke test.
