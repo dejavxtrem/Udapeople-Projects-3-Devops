@@ -471,6 +471,7 @@ jobs:
             sudo apt install python3-pycurl
             sudo apt install python3-pip
             sudo apt install nodejs
+            sudo apt install npm
 
 
       - run:
@@ -497,9 +498,14 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            # your code here
-            echo "${API_URL}"          
-            if [ curl "${API_URL}/api/status" | grep "ok" ]
+            export BACKEND_IP=$(aws ec2 describe-instances \
+                                    --filters Name=tag:Name,Values="backend-${CIRCLE_WORKFLOW_ID}" Name=instance-state-name,Values=running \
+                                    --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                                    --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+                     
+            if curl -s "${API_URL}/api/status" | grep "ok"
             then
               return 0
             else
