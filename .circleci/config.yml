@@ -408,14 +408,15 @@ jobs:
 
       - run:
           name: Install dependencies
+          working_directory: ./.circleci/ansible
           command: |
             # your code here
-            apk add --update ansible openssh-client tar gzip nodejs npm
+            apk add --update ansible openssh-client tar gzip nodejs npm curl
+            pip install awscli
       - run:
           name: Deploy backend
           command: |
             # your code here
-            cd /home/circleci/project
             echo    ENVIRONMENT=production                                 > "backend/.env"
             echo    TYPEORM_CONNECTION=postgres                            >> "backend/.env"
             echo    TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts   >> "backend/.env"
@@ -450,11 +451,11 @@ jobs:
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt \
             ~/project/.circleci/ansible/deploy-backend.yml
      
-      - run:
-          name: Install AWS CLI for rollback
-          when: on_fail
-          command: |
-              sudo add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+      # - run:
+      #     name: Install AWS CLI for rollback
+      #     when: on_fail
+      #     command: |
+      #           # sudo add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
       # Here's where you will add some code to rollback on failure 
       - revert-migrations
       - destroy-environment:
