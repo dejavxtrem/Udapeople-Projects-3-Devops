@@ -458,27 +458,17 @@ jobs:
   smoke-test:
     docker:
       # Lightweight Docker image
-      - image: cimg/base:2021.04
+      - image: python:3.7-alpine3.11 
     steps:
       # Checkout code from git
       - checkout
       - run:
           name: Install dependencies
           command: |
-            sudo apt update && sudo apt upgrade
-            sudo apt install curl
-            apt-cache search libcurl | grep python
-            sudo apt install python3-pycurl
-            sudo apt install python3-pip
-            sudo apt install nodejs
-            sudo apt install npm 
-
-
-      - run:
-          name: Install AWS CLI 
-          command: |
+            apk add --update curl nodejs npm
             pip3 install --upgrade pip
-            pip3 install awscli
+            pip install awscli
+
       - attach_workspace:
             at: ~/
 
