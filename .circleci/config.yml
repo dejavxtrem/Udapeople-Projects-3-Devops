@@ -417,7 +417,7 @@ jobs:
           name: Deploy backend
           command: |
             # your code here
-            echo    ENVIRONMENT=production                                 > "backend/.env"
+            echo    ENVIRONMENT=development                                 > "backend/.env"
             echo    TYPEORM_CONNECTION=postgres                            >> "backend/.env"
             echo    TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts   >> "backend/.env"
             echo    TYPEORM_MIGRATIONS=./src/migrations/*.ts               >> "backend/.env"
@@ -441,7 +441,6 @@ jobs:
             cd backend
             npm i
             npm run build
-            cd package* ./dist
             cd ..
             tar -C backend -czvf artifact.tar.gz .
             pwd
