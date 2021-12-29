@@ -515,13 +515,15 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here
-            URL=http://udapeople-324de269-69fa-44dc-b1b1-20e0a01bb8f4.s3-website-us-west-2.amazonaws.com/#/employees
+            URL=http://udapeople-${CIRCLE_WORKFLOW_ID}.s3-website-us-west-2.amazonaws.com/#/employees
             echo ${URL}
             if curl -s ${URL} | grep "Welcome"
             then
               echo "connected on frontend ${URL}"
+              return 1
             else
               echo "not connected on frontend ${url}"
+              return 1
             fi
 
       # Here's where you will add some code to rollback on failure 
