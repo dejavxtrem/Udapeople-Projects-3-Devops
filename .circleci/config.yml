@@ -405,8 +405,6 @@ jobs:
       # attach workspace
       - attach_workspace:
             at: ~/
-      - restore_cache:
-            keys: ['backend-build']
 
       - run:
           name: Install dependencies
@@ -432,20 +430,25 @@ jobs:
 
             echo
             cat backend/.env
-            tar czf backend.tar.gz -P backend
-            cp backend.tar.gz /home
-            pwd
-            ls -la
+            
           
             
             
       - run:
           name: Deploy  ansible-backend
           command: |
+            cd backend
+            npm i
+            npm run build
+            cd package* ./dist
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
+            pwd
+            cat ~/project/.circleci/ansible//inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook \
-            -i .circleci/ansible/inventory.txt \
-            .circleci/ansible/deploy-backend.yml
+            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt \
+            ~/project/.circleci/ansible/deploy-backend.yml
      
       - run:
           name: Install AWS CLI for rollback

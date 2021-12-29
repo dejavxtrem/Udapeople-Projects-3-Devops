@@ -1,19 +1,32 @@
 ## Deployment playbook goes here.
 ---
+- name: create backend directory
+  become: yes
+  file:
+    path: ~/backend
+    state: directory
+    mode: 0755
+
 - name: Copy backend files
-  become: true
+  become: yes
   copy:
-      src: /home/backend.tar.gz
-      dest: /home/ubuntu/backend.tar.gz
+      src: ~/project/artifact.tar.gz
+      dest: ~/backend/artifact.tar.gz
+
+
+- name: unpack backend files
+  become: yes
+  shell: |
+    tar -vxf artifact.tar.gz
+    rm -f artifact.tar.gz
+  args:
+    chdir: /root/backend
 
 - name: Start PM2
   shell: |
-      cd /home/ubuntu/
-      tar xzvf backend.tar.gz
-      cd backend
-      sudo npm install -g npm@latest
-      sudo npm install -g webpack-dev-server
-      sudo npm install
-      sudo npm run build
-      pm2 stop default
-      sudo pm2 start npm --name backend -- start
+    cd ~/backend
+    npm install
+    pm2 stop default
+    pm2 start npm -- start
+    cd dist
+    pm2 start main.js --update-env
