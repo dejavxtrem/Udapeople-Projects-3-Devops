@@ -434,6 +434,8 @@ jobs:
             cat backend/.env
             tar czf backend.tar.gz -P backend
             cp backend.tar.gz /home
+            pwd
+            ls -la
           
             
             
