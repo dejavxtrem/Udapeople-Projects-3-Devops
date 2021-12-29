@@ -432,8 +432,6 @@ jobs:
             echo
             cat backend/.env
             
-          
-            
             
       - run:
           name: Deploy  ansible-backend
@@ -476,7 +474,7 @@ jobs:
             sudo apt install python3-pycurl
             sudo apt install python3-pip
             sudo apt install nodejs
-            sudo apt install npm
+            sudo apt install npm 
 
 
       - run:
