@@ -510,7 +510,7 @@ jobs:
             if curl -s ${URL} | grep "Welcome"
             then
               echo "connected on frontend ${URL}"
-              return 1
+              return 0
             else
               echo "not connected on frontend ${url}"
               return 1
@@ -522,6 +522,37 @@ jobs:
             workflow_id: '${CIRCLE_WORKFLOW_ID}'
             
       # Here's where you will add some code to rollback on failure 
+  
+  cloudfront-update:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: python:3.7-alpine3.11
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl nodejs npm
+            pip3 install --upgrade pip
+            pip install awscli
+
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            # your code here
+            aws cloudformation deploy \
+            --template-file .circleci/files/cloudfront.yml \
+            --stack-name InitialStack \
+            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID}" \
+            --tags project=udapeople
+      
+      # Here's where you will add some code to rollback on failure 
+      - revert-migrations
+      - destroy-environment:
+            workflow_id: '${CIRCLE_WORKFLOW_ID}'
+
+
 
 
 workflows:
@@ -552,4 +583,6 @@ workflows:
       - deploy-backend:
            requires: [run-migrations]
       - smoke-test:
-           requires: [deploy-backend, deploy-frontend]   
+           requires: [deploy-backend, deploy-frontend] 
+      - cloudfront-update:
+          requires: [smoke-test]  
