@@ -363,7 +363,7 @@ jobs:
             # your code here
             export BACKEND_IP=$(aws ec2 describe-instances \
                                     --filters Name=tag:Name,Values="backend-${CIRCLE_WORKFLOW_ID}" Name=instance-state-name,Values=running \
-                                    --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                                    --query 'Reservations[*].Instances[*].PublicDnsName' \
                                     --output text)
 
             export API_URL="http://${BACKEND_IP}:3030"
@@ -372,7 +372,7 @@ jobs:
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             echo     ENVIRONMENT=production     >  "frontend/.env"
             echo     NODE_ENV=production        >> "frontend/.env"
-            cat frontend/.env
+            cat "frontend/.env"
 
       - run:
           name: Deploy frontend objects
