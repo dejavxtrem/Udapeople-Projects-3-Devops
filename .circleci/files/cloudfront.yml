@@ -26,6 +26,7 @@ Resources:
               HTTPPort: 80
               HTTPSPort: 443
               OriginProtocolPolicy: http-only
+        Enabled: True
         DefaultRootObject: index.html
         DefaultCacheBehavior:
           ForwardedValues:
