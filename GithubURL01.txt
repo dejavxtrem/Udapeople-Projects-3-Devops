@@ -1,6 +1,6 @@
-https://github.com/dejavxtrem/Udapeople-Projects-3-Devops/tree/development
+https://github.com/dejavxtrem/Udapeople-Projects-3-Devops
 
 
 
 public URL02 S3 Bucket 
-http://udapeople-223d2984-5e8a-4c23-ba56-0815bfb83ac4.s3-us-west-2.amazonaws.com/index.html#/employees
+http://udapeople-d01d6e97-7b04-4102-875b-f1afa75de147.s3-website-us-west-2.amazonaws.com/#/employees
