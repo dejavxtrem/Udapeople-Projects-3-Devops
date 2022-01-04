@@ -298,7 +298,8 @@ jobs:
 
             cd backend
             npm install
-            npm install typescript      
+            npm install typescript  
+            npm run migrations:revert    
             npm run migrations > migrations_dump.txt
 
 
@@ -317,9 +318,11 @@ jobs:
             cd backend
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-                # curl -H "Content-Type: text/plain" -H "token: 6e293650-a25d-4950-b76a-a40052493b7e" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
-                data=1
-                echo $data
+              # curl -H "Content-Type: text/plain" -H "token: 6e293650-a25d-4950-b76a-a40052493b7e" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
+              data=1
+              echo $data
+            else
+              echo "Migration failed"
             fi
      # Here's where you will add some code to rollback on failure  
       - persist_to_workspace:
@@ -555,7 +558,7 @@ jobs:
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
             --stack-name udapeople-cloud-front \
-            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID}" \
+            --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID},UsePreviousValue=false
             --tags project=udapeople
       
       # Here's where you will add some code to rollback on failure 
@@ -596,7 +599,7 @@ jobs:
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID}"
             echo Stack names: "${STACKS[@]}"
 
-            if [[ "${OldWorkflowID}" != "${CIRCLE_WORKFLOW_ID}" ]] 
+            if [[ "${STACKS[@]}" =~ "${OldWorkflowId}" ]] 
             then
               # Delete files from bucket
               echo "s3://udapeople-${OldWorkflowID}"
